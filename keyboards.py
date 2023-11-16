@@ -31,12 +31,23 @@ item_card_available_kb = InlineKeyboardMarkup(inline_keyboard=[
                              callback_data='update_treshhold'),
     ],
     [
-        InlineKeyboardButton(text='Перейти к товару по ссылке', callback_data='follow_the_link')],
+        InlineKeyboardButton(text='Перейти к товару по ссылке', callback_data='follow_the_link',
+                             url='https://google.com')],
 
     [
         InlineKeyboardButton(text='Посмотреть динамику цен', callback_data='price_diagram'),
     ]
 ])
+
+item_card_not_available_kb = InlineKeyboardMarkup(inline_keyboard=[
+    [
+        InlineKeyboardButton(text='Прекратить отслеживание', callback_data='stop_tracking')]
+    ,
+    [
+        InlineKeyboardButton(text='Перейти к товару по ссылке', callback_data='follow_the_link',
+                             url='https://google.com')]
+])
+
 return_to_menu_kb = InlineKeyboardMarkup(
     inline_keyboard=[[InlineKeyboardButton(text="Назад", callback_data='to_menu')]])
 
@@ -62,3 +73,6 @@ update_treshhold_kb = InlineKeyboardMarkup(inline_keyboard=[
         InlineKeyboardButton(text='Назад', callback_data='to_card_item'),
     ]
 ])
+
+return_to_card_item_kb = InlineKeyboardMarkup(
+    inline_keyboard=[[InlineKeyboardButton(text="Назад", callback_data='to_card')]])

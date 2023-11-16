@@ -10,11 +10,9 @@ price_diagram_router = Router()
 @price_diagram_router.callback_query(F.data == 'price_diagram')
 async def price_diagram(callback: CallbackQuery):
     url = get_diagram()
-    await callback.message.edit_text(f"{hide_link(url)}"
-                f"вот такой график")
+    await callback.message.edit_text(f"{hide_link(url)}График изменения цены товара",
+                                     reply_markup=keyboards.return_to_card_item_kb)
 
 
 def get_diagram():
-    return "https://yandex.ru/images/search?" \
-           "from=tabbar&img_url=https%3A%2F%2Fhr-portal.ru%2Ffiles%2Fmini%2Fanaliz1." \
-           "jpg&lr=2&pos=0&rpt=simage&text=график"
+    return "https://hr-portal.ru/files/mini/analiz1.jpg"

@@ -15,6 +15,6 @@ async def command_start(message: Message, state: FSMContext) -> None:
     # мои товары, добавить товар, помощь, обратиться в поддержку
     await state.set_state(Form.menu)
     await message.answer(
-        "Здарова, это наш бот тут можно отслеживать товары, нажми на кнопку",
+        "Cправочная информация",
         reply_markup=keyboards.menu_kb,
     )

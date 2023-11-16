@@ -7,3 +7,4 @@ class Form(StatesGroup):
     language = State()
     menu = State()
     articul = State()
+    support = State()
