@@ -14,10 +14,11 @@ add_item_router = Router()
 
 @add_item_router.message(Form.articul)
 async def process_name(message: Message, state: FSMContext) -> None:
-    await state.update_data(articul=message.text)
+    number = message.text
+    await state.update_data(articul=number)
 
-    if utils.validateArticul():
-        if utils.existInAPI():
+    if utils.validate_articul(number):
+        if utils.exist_in_api(number):
             await state.set_state(Form.menu)
             if utils.item_in_bd():
                 if utils.user_already_have_its_item():
