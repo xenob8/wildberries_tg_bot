@@ -8,6 +8,7 @@ from aiogram.types import Message
 import keyboards
 import utils
 from form import Form
+from api import api_service
 
 add_item_router = Router()
 
@@ -16,9 +17,9 @@ add_item_router = Router()
 async def process_name(message: Message, state: FSMContext) -> None:
     number = message.text
     await state.update_data(articul=number)
-
     if utils.validate_articul(number):
-        if utils.exist_in_api(number):
+        exists = await utils.exist_in_api(number)
+        if exists:
             await state.set_state(Form.menu)
             if utils.item_in_bd():
                 if utils.user_already_have_its_item():

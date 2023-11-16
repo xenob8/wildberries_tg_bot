@@ -2,11 +2,11 @@ from api import api_service
 
 
 def validate_articul(number) -> bool:
-    return True if number.isdigit() and len(number) <= 20 else False
+    return number.isdigit() and len(number) <= 20
 
 
-def exist_in_api(number):
-    return True if api_service.get_product(number) else False
+async def exist_in_api(number):
+    return await api_service.get_product(number)
 
 
 def item_in_bd():
