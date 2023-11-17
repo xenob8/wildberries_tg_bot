@@ -19,6 +19,7 @@ from handlers.on_start.items.price_diagram.price_diagram import price_diagram_ro
 from handlers.on_start.items.stop_tracking import stop_tracking_router
 from handlers.on_start.support import support_router
 from handlers.start import on_start_router
+from api import api_service
 
 TOKEN = config.TOKEN
 print(TOKEN)
