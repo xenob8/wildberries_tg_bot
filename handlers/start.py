@@ -4,7 +4,9 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import Message
 
+
 import keyboards
+import utils
 from form import Form
 
 on_start_router = Router()
@@ -15,6 +17,6 @@ async def command_start(message: Message, state: FSMContext) -> None:
     # мои товары, добавить товар, помощь, обратиться в поддержку
     await state.set_state(Form.menu)
     await message.answer(
-        "Cправочная информация",
+        utils.info,
         reply_markup=keyboards.menu_kb,
     )

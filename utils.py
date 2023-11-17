@@ -15,3 +15,5 @@ def item_in_bd():
 
 def user_already_have_its_item():
     return True
+
+info = ("Привет! Я бот для мониторинга цен на маркетплейсе Wildberries. ...")
