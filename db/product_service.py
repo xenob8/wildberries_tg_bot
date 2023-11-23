@@ -9,6 +9,7 @@ class ProductService:
 
     def __init__(self, engine):
         self.session = sessionmaker(bind=engine)
+
     @session_decorator
     def product_exists_by_number(self, number, session):
         product = session.query(Product).filter_by(number=number).first()
@@ -17,6 +18,7 @@ class ProductService:
     @session_decorator_nested
     def get_product(self, number, session: Session):
         return session.query(Product).filter_by(number=number).first()
+
     @session_decorator_nested
     def patch_product(self, number, product_update: ProductUpdateDto, session):
         # product = session.query(Product).filter_by(number=number).first()
@@ -28,3 +30,8 @@ class ProductService:
             print("value", value)
             if value is not None:
                 setattr(product, attr, value)
+
+    @session_decorator
+    def add_product(self, product: Product, session: Session):
+        if not self.product_exists_by_number(product.number, session):
+            session.add(Product)
