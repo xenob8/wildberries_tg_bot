@@ -31,13 +31,11 @@ from middleware.service_middleware import CounterMiddleware, ServiceMiddleware
 TOKEN = config.TOKEN
 print(TOKEN)
 
-DATABASE_URL = f"postgresql://nhm5QjITYfBRi51punlNCMnOBAmXXBvi:{config.bd_pass}@trumpet.db.elephantsql.com/dyvawvhc"
+DATABASE_URL = f"postgresql://dyvawvhc:{config.bd_pass}@trumpet.db.elephantsql.com/dyvawvhc"
 
 engine = create_engine(DATABASE_URL)
 
-
 router.message.middleware(ServiceMiddleware(engine))
-
 
 class Form(StatesGroup):
     name = State()
