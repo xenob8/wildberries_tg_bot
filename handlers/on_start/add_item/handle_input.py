@@ -10,10 +10,10 @@ import utils
 from form import Form
 from api import api_service
 
-add_item_router = Router()
+from handlers.router import router
 
 
-@add_item_router.message(Form.articul)
+@router.message(Form.articul)
 async def process_name(message: Message, state: FSMContext) -> None:
     number = message.text
     await state.update_data(articul=number)

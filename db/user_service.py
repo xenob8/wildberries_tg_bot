@@ -1,3 +1,4 @@
+from sqlalchemy import insert
 from sqlalchemy.orm import sessionmaker, Session
 from db.models.product import Product
 from db.models.user import User
@@ -16,8 +17,9 @@ class UserService:
         return session.query(User).filter_by(telegram_id=telegram_id).first()
 
     @session_decorator
-    def add_user(self, user: User, session: Session):
-        session.add(user)
+    def add_user(self, telegram_id, session: Session):
+        inserting_user = insert(User).values(telegram_id=telegram_id)
+        session.execute(inserting_user)
 
     @session_decorator
     def get_user_products(self, telegram_id: int, session: Session):

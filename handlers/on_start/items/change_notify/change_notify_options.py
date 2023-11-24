@@ -3,10 +3,10 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 
 import keyboards
+from handlers.router import router
 
-update_treshhold_options_router = Router()
 
-@update_treshhold_options_router.callback_query(F.data.startswith('diff_'))
+@router.callback_query(F.data.startswith('diff_'))
 async def update_treshhold_to_n(callback: CallbackQuery):
     percent = callback.data.split("_")[1]
     if percent == 'always':

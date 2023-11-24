@@ -4,10 +4,10 @@ from aiogram.utils.markdown import hide_link
 
 import keyboards
 
-price_diagram_router = Router()
+from handlers.router import router
 
 
-@price_diagram_router.callback_query(F.data == 'price_diagram')
+@router.callback_query(F.data == 'price_diagram')
 async def price_diagram(callback: CallbackQuery):
     url = get_diagram()
     await callback.message.edit_text(f"{hide_link(url)}График изменения цены товара",

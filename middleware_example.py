@@ -23,6 +23,7 @@ from sqlalchemy import create_engine
 
 import config
 from db.product_service import ProductService
+from handlers.router import router
 from middleware.service_middleware import CounterMiddleware, ServiceMiddleware
 
 # from handlers.on_start.add_item import add_item_router
@@ -30,12 +31,12 @@ from middleware.service_middleware import CounterMiddleware, ServiceMiddleware
 TOKEN = config.TOKEN
 print(TOKEN)
 
-DATABASE_URL = f"postgresql://dyvawvhc:{config.bd_pass}@trumpet.db.elephantsql.com/dyvawvhc"
+DATABASE_URL = f"postgresql://nhm5QjITYfBRi51punlNCMnOBAmXXBvi:{config.bd_pass}@trumpet.db.elephantsql.com/dyvawvhc"
 
 engine = create_engine(DATABASE_URL)
 
-form_router = Router()
-form_router.message.middleware(ServiceMiddleware(engine))
+
+router.message.middleware(ServiceMiddleware(engine))
 
 
 class Form(StatesGroup):
@@ -44,7 +45,7 @@ class Form(StatesGroup):
     language = State()
 
 
-@form_router.message(CommandStart())
+@router.message(CommandStart())
 async def command_start(message: Message, state: FSMContext, product_service: ProductService) -> None:
     print("exists?")
     print(product_service.product_exists_by_number(1))
@@ -60,7 +61,7 @@ async def command_start(message: Message, state: FSMContext, product_service: Pr
 async def main():
     bot = Bot(token=TOKEN, parse_mode=ParseMode.HTML)
     dp = Dispatcher()
-    dp.include_routers(form_router)
+    dp.include_routers(router)
 
 
     await dp.start_polling(bot)

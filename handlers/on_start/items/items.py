@@ -6,10 +6,10 @@ from aiogram.utils.markdown import hide_link
 import keyboards
 from form import Form
 
-my_items_router = Router()
+from handlers.router import router
 
 
-@my_items_router.message(Form.menu, F.text.casefold() == '🛍 мои товары')
+@router.message(Form.menu, F.text.casefold() == '🛍 мои товары')
 async def my_items(message: Message) -> None:
     my_items = get_items(message.from_user.id)
     if my_items is None:
