@@ -1,3 +1,4 @@
+from sqlalchemy import insert
 from sqlalchemy.orm import sessionmaker, Session
 
 from db.dto.ProductUpdateDto import ProductUpdateDto
@@ -17,7 +18,9 @@ class ProductService:
 
     @session_decorator_nested
     def get_product(self, number, session: Session):
-        return session.query(Product).filter_by(number=number).first()
+        product = session.query(Product).filter_by(number=number).first()
+        session.expunge_all()
+        return product
 
     @session_decorator_nested
     def patch_product(self, number, product_update: ProductUpdateDto, session):
@@ -32,6 +35,8 @@ class ProductService:
                 setattr(product, attr, value)
 
     @session_decorator
-    def add_product(self, product: Product, session: Session):
-        if not self.product_exists_by_number(product.number, session):
-            session.add(Product)
+    def add_product(self, number, title, availability, price, session: Session):
+        if not self.product_exists_by_number(number):
+            inserting_product = insert(Product).values(number=number, title=title, availability=availability,
+                                                       price=price)
+            session.execute(inserting_product)

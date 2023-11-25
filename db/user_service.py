@@ -1,4 +1,4 @@
-from sqlalchemy import insert
+from sqlalchemy import insert, select
 from sqlalchemy.orm import sessionmaker, Session
 from db.models.product import Product
 from db.models.user import User
@@ -23,8 +23,16 @@ class UserService:
 
     @session_decorator
     def get_user_products(self, telegram_id: int, session: Session):
-        products = session.query(Product).join(UserProduct).filter(UserProduct.user_telegram_id == telegram_id).all()
+        products = session.query(Product, UserProduct).join(UserProduct, UserProduct.product_id == Product.id)\
+            .filter(UserProduct.user_telegram_id == telegram_id).all()
+        session.expunge_all()
         return products
+
+    @session_decorator
+    def user_product_exists_by_number(self, telegram_id: int, number: int, session: Session):
+        product = session.query(Product).join(UserProduct).filter(
+            UserProduct.user_telegram_id == telegram_id and Product.number == number).all()
+        return True if product else False
 
     @session_decorator_nested
     def delete_user_product(self, telegram_id, product_number, session: Session):
@@ -43,8 +51,10 @@ class UserService:
             session.commit()
 
     @session_decorator
-    def add_user_product(self, telegram_id, product: Product, session: Session):
-        if not ProductService.product_exists_by_number(product.number, session):
-            ProductService.add_product(product, session)
-        user_product = UserProduct(telegram_id, product.id, product.price, 0)
-        session.add(user_product)
+    def add_user_product(self, telegram_id, number, product_service: ProductService, session: Session):
+        # if not product_service.product_exists_by_number(product.number):
+        #     product_service.add_product(product)
+        product = product_service.get_product(number)
+        inserting_user = insert(UserProduct).values(user_telegram_id=telegram_id, product_id=product.id,
+                                                    start_price=product.price, alert_threshold=0)
+        session.execute(inserting_user)
