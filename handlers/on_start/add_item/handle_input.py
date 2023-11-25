@@ -21,20 +21,21 @@ from handlers.router import router
 @router.message(Form.articul)
 async def process_name(message: Message, state: FSMContext, product_service: ProductService,
                        user_service: UserService) -> None:
-    number = int(message.text)
+    number = message.text
     user_id = message.from_user.id
     await state.update_data(articul=number)
     if utils.validate_articul(number):
+        number = int(number)
         exists = await utils.exist_in_api(number)
         if exists:
             await state.set_state(Form.menu)
             product = product_service.get_product(number)
             if product:
                 if user_service.user_product_exists_by_number(user_id, product.number):
-                    await message.answer(f"Вы уже отслеживаете этот товар!")
+                    await message.answer(f"Вы уже отслеживаете этот товар!", reply_markup=keyboards.menu_kb)
                 else:
                     user_service.add_user_product(user_id, number, product_service)
-                    await message.answer(f"Товар успешно добавлен!")
+                    await message.answer(f"Товар успешно добавлен!", reply_markup=keyboards.menu_kb)
                     info, kb = get_card(api_service.get_image(int(number)), product.availability, product.title,
                                         product.price, product.price, 0, 0)
                     await message.answer(

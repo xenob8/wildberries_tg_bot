@@ -7,7 +7,7 @@ import keyboards
 from handlers.router import router
 
 
-@router.callback_query(F.data == 'price_diagram')
+@router.callback_query(F.data.startswith('price_diagram'))
 async def price_diagram(callback: CallbackQuery):
     url = get_diagram()
     await callback.message.edit_text(f"{hide_link(url)}График изменения цены товара",
