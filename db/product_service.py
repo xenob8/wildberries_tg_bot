@@ -23,6 +23,12 @@ class ProductService:
         return product
 
     @session_decorator_nested
+    def get_all_product(self, session: Session):
+        products = session.query(Product).all()
+        session.expunge_all()
+        return products
+
+    @session_decorator_nested
     def patch_product(self, number, product_update: ProductUpdateDto, session):
         # product = session.query(Product).filter_by(number=number).first()
         product = self.get_product(number, session=session)
