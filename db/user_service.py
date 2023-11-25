@@ -23,15 +23,22 @@ class UserService:
 
     @session_decorator
     def get_user_products(self, telegram_id: int, session: Session):
-        products = session.query(Product, UserProduct).join(UserProduct, UserProduct.product_id == Product.id)\
-            .filter(UserProduct.user_telegram_id == telegram_id).all()
+        products = session.query(Product, UserProduct).join(UserProduct, UserProduct.product_id == Product.id) \
+            .filter(UserProduct.user_telegram_id == telegram_id)
         session.expunge_all()
         return products
 
     @session_decorator
+    def get_user_product_by_number(self, telegram_id: int, number: int, session: Session):
+        product = session.query(Product, UserProduct).join(UserProduct, UserProduct.product_id == Product.id) \
+            .filter(UserProduct.user_telegram_id == telegram_id).filter(Product.number == number).first()
+        session.expunge_all()
+        return product
+
+    @session_decorator
     def user_product_exists_by_number(self, telegram_id: int, number: int, session: Session):
-        product = session.query(Product).join(UserProduct).filter(
-            UserProduct.user_telegram_id == telegram_id and Product.number == number).all()
+        product = session.query(Product).join(UserProduct).filter(UserProduct.user_telegram_id == telegram_id). \
+            filter(Product.number == number).all()
         return True if product else False
 
     @session_decorator_nested
@@ -44,10 +51,18 @@ class UserService:
 
     @session_decorator_nested
     def patch_alert_threshold(self, telegram_id, product_number, alert_threshold: int, session: Session):
-        product_id = session.query(Product).filter_by(number=product_number).first()
-        user_product = session.query(UserProduct).filter_by(user_telegram_id=telegram_id, product_id=product_id)
+        product = session.query(Product).filter_by(number=product_number).first()
+        user_product = session.query(UserProduct).filter_by(user_telegram_id=telegram_id, product_id=product.id)
         if user_product:
             user_product.update({"alert_threshold": alert_threshold})
+            session.commit()
+
+    @session_decorator_nested
+    def patch_start_price(self, telegram_id, product_number, session: Session):
+        product = session.query(Product).filter_by(number=product_number).first()
+        user_product = session.query(UserProduct).filter_by(user_telegram_id=telegram_id, product_id=product.id)
+        if user_product:
+            user_product.update({"start_price": product.price})
             session.commit()
 
     @session_decorator

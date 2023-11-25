@@ -21,7 +21,7 @@ from handlers.router import router
 @router.message(Form.articul)
 async def process_name(message: Message, state: FSMContext, product_service: ProductService,
                        user_service: UserService) -> None:
-    number = message.text
+    number = int(message.text)
     user_id = message.from_user.id
     await state.update_data(articul=number)
     if utils.validate_articul(number):
@@ -35,9 +35,11 @@ async def process_name(message: Message, state: FSMContext, product_service: Pro
                 else:
                     user_service.add_user_product(user_id, number, product_service)
                     await message.answer(f"Товар успешно добавлен!")
+                    info, kb = get_card(api_service.get_image(int(number)), product.availability, product.title,
+                                        product.price, product.price, 0, 'при каждом изменении')
                     await message.answer(
-                        get_card(api_service.get_image(int(number)), product.title, product.price, product.price, 0, 'при каждом изменении'),
-                        reply_markup=keyboards.item_card_available_kb
+                        info,
+                        reply_markup=kb(number)
                     )
                     # прислать карточку
                     # успешно выйти в главное меню
@@ -52,10 +54,12 @@ async def process_name(message: Message, state: FSMContext, product_service: Pro
                                             product_from_api[0]['salePriceU'] / 100)
                 user_service.add_user_product(user_id, number, product_service)
                 await message.answer(f"Товар успешно добавлен!")
+                info, kb = get_card(api_service.get_image(int(number)), availability, product_from_api[0]['name'],
+                                    product_from_api[0]['salePriceU'] / 100,
+                                    product_from_api[0]['salePriceU'] / 100, 0, 0)
                 await message.answer(
-                    get_card(api_service.get_image(int(number)), product_from_api[0]['name'], product_from_api[0]['salePriceU'] / 100,
-                             product_from_api[0]['salePriceU'] / 100, 0, 'при каждом изменении'),
-                    reply_markup=keyboards.item_card_available_kb
+                    info,
+                    reply_markup=kb(number)
                 )
                 # прислать карточку
                 # успешно выйти в главное меню
