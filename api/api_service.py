@@ -10,6 +10,7 @@ async def get_product(number):
         "appType": 1,
         "curr": "rub",
         "dest": -1257786,
+        "spp": 29,
         "nm": number,
     }
     async with get_session("https://card.wb.ru/") as session:
