@@ -36,7 +36,7 @@ async def process_name(message: Message, state: FSMContext, product_service: Pro
                     user_service.add_user_product(user_id, number, product_service)
                     await message.answer(f"Товар успешно добавлен!")
                     info, kb = get_card(api_service.get_image(int(number)), product.availability, product.title,
-                                        product.price, product.price, 0, 'при каждом изменении')
+                                        product.price, product.price, 0, 0)
                     await message.answer(
                         info,
                         reply_markup=kb(number)
