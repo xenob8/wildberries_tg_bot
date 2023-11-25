@@ -81,4 +81,4 @@ async def get_price_history(number):
     async with get_session(f"https://basket-{basket}.wb.ru/") as session:
         async with session.get(
                 f"/vol{number // 100000}/part{number // 1000}/{number}/info/price-history.json") as resp:
-            return resp.json() if resp.ok else None
+            return await resp.json() if resp.ok else None
