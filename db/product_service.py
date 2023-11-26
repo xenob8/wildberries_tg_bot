@@ -13,18 +13,19 @@ class ProductService:
         self.session = sessionmaker(bind=engine, class_=AsyncSession)
 
     @session_decorator
-    def product_exists_by_number(self, number, session):
+    async def product_exists_by_number(self, number, session):
+
         product = session.query(Product).filter_by(number=number).first()
         return product is not None
 
-    @session_decorator_nested
-    def get_product(self, number, session: Session):
+    @session_decorator
+    async def get_product(self, number, session: Session):
         product = session.query(Product).filter_by(number=number).first()
         session.expunge_all()
         return product
 
     @session_decorator_nested
-    def patch_product(self, number, product_update: ProductUpdateDto, session):
+    async def patch_product(self, number, product_update: ProductUpdateDto, session):
         # product = session.query(Product).filter_by(number=number).first()
         product = self.get_product(number, session=session)
         if not product:
@@ -36,7 +37,7 @@ class ProductService:
                 setattr(product, attr, value)
 
     @session_decorator
-    def add_product(self, number, title, availability, price, session: Session):
+    async def add_product(self, number, title, availability, price, session: Session):
         if not self.product_exists_by_number(number):
             inserting_product = insert(Product).values(number=number, title=title, availability=availability,
                                                        price=price)

@@ -21,9 +21,9 @@ class UserService:
         # return session.query(User).filter_by(telegram_id=telegram_id).first()
 
     @session_decorator
-    def add_user(self, telegram_id, session: Session):
+    async def add_user(self, telegram_id, session: Session):
         inserting_user = insert(User).values(telegram_id=telegram_id)
-        session.execute(inserting_user)
+        await session.execute(inserting_user)
 
     @session_decorator
     async def get_user_products(self, telegram_id: int, session: Session):
@@ -36,47 +36,62 @@ class UserService:
         return products
 
     @session_decorator
-    def get_user_product_by_number(self, telegram_id: int, number: int, session: Session):
-        product = session.query(Product, UserProduct).join(UserProduct, UserProduct.product_id == Product.id) \
-            .filter(UserProduct.user_telegram_id == telegram_id).filter(Product.number == number).first()
+    async def get_user_product_by_number(self, telegram_id: int, number: int, session: Session):
+        query = select(Product, UserProduct).join(UserProduct, UserProduct.product_id == Product.id) \
+            .filter(UserProduct.user_telegram_id == telegram_id).filter(Product.number == number)
+        result = await session.execute(query)
+        product = result.first()
         session.expunge_all()
         return product
 
     @session_decorator
-    def user_product_exists_by_number(self, telegram_id: int, number: int, session: Session):
-        product = session.query(Product).join(UserProduct).filter(UserProduct.user_telegram_id == telegram_id). \
-            filter(Product.number == number).all()
+    async def user_product_exists_by_number(self, telegram_id: int, number: int, session: Session):
+        query = select(Product).join(UserProduct).filter(UserProduct.user_telegram_id == telegram_id). \
+            filter(Product.number == number)
+        result = await session.execute(query)
+        product = result.all()
         return True if product else False
 
-    @session_decorator_nested
-    def delete_user_product(self, telegram_id, product_number, session: Session):
-        user_product = session.query(UserProduct).filter_by(user_telegram_id=telegram_id).join(Product).filter_by(
-            number=product_number).first()
+    @session_decorator
+    async def delete_user_product(self, telegram_id, product_number, session: Session):
+        query = select(UserProduct).filter_by(user_telegram_id=telegram_id).join(Product).filter_by(
+            number=product_number)
+        result = await session.execute(query)
+        user_product = result.first()
         if user_product:
-            session.delete(user_product)
-            session.commit()
+            await session.delete(user_product)
+            # await session.commit() должен итак примениться надеюсь
 
-    @session_decorator_nested
-    def patch_alert_threshold(self, telegram_id, product_number, alert_threshold: int, session: Session):
-        product = session.query(Product).filter_by(number=product_number).first()
-        user_product = session.query(UserProduct).filter_by(user_telegram_id=telegram_id, product_id=product.id)
+    @session_decorator
+    async def patch_alert_threshold(self, telegram_id, product_number, alert_threshold: int, session: Session):
+        query = select(Product).filter_by(number=product_number)
+        result = await session.execute(query)
+        product = result.first()
+        query = select(UserProduct).filter_by(user_telegram_id=telegram_id, product_id=product.id)
+        result = await session.execute(query)
+        user_product = result.first()
         if user_product:
             user_product.update({"alert_threshold": alert_threshold})
-            session.commit()
+            # session.commit()
 
-    @session_decorator_nested
-    def patch_start_price(self, telegram_id, product_number, session: Session):
-        product = session.query(Product).filter_by(number=product_number).first()
-        user_product = session.query(UserProduct).filter_by(user_telegram_id=telegram_id, product_id=product.id)
+    @session_decorator
+    async def patch_start_price(self, telegram_id, product_number, session: Session):
+        query = select(Product).filter_by(number=product_number)
+        result = await session.execute(query)
+        product = result.first()
+
+        query = select(UserProduct).filter_by(user_telegram_id=telegram_id, product_id=product.id)
+        result = await session.execute(query)
+        user_product = result.first()
         if user_product:
             user_product.update({"start_price": product.price})
             session.commit()
 
-    @session_decorator
-    def add_user_product(self, telegram_id, number, product_service: ProductService, session: Session):
+    @session_decorator_nested
+    async def add_user_product(self, telegram_id, number, product_service: ProductService, session: Session):
         # if not product_service.product_exists_by_number(product.number):
         #     product_service.add_product(product)
-        product = product_service.get_product(number)
+        product = await product_service.get_product(number)
         inserting_user = insert(UserProduct).values(user_telegram_id=telegram_id, product_id=product.id,
                                                     start_price=product.price, alert_threshold=0)
-        session.execute(inserting_user)
+        await session.execute(inserting_user)
