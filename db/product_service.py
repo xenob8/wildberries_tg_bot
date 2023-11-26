@@ -50,7 +50,6 @@ class ProductService:
 
     @session_decorator
     def get_users_of_product(self, number, session: Session):
-        user_products = session.query(Product).filter_by(number=number).join(UserProduct,
-                                                                             UserProduct.product_id == Product.id).all()
+        user_products = session.query(UserProduct).join(Product).filter_by(number=number).all()
         session.expunge_all()
         return user_products
