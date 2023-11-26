@@ -18,3 +18,4 @@ class UserProductService:
         inserting_user = insert(User).values(telegram_id=telegram_id)
         session.execute(inserting_user)
 
+

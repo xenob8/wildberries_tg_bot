@@ -55,7 +55,7 @@ class UserProductService:
             user_product.update({"start_price": product.price})
             session.commit()
 
-    @session_decorator
+    @session_decorator_nested
     def add_user_product(self, telegram_id, number, product_service: ProductService, session: Session):
         # if not product_service.product_exists_by_number(product.number):
         #     product_service.add_product(product)
@@ -63,3 +63,9 @@ class UserProductService:
         inserting_user = insert(UserProduct).values(user_telegram_id=telegram_id, product_id=product.id,
                                                     start_price=product.price, alert_threshold=0)
         session.execute(inserting_user)
+
+    @session_decorator
+    def get_all_user_products(self, session: Session):
+        user_products = session.query(UserProduct).all()
+        session.expunge_all()
+        return user_products
