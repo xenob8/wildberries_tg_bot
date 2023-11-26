@@ -1,16 +1,13 @@
 # При нажатии на кнопку “Добавить товар” бот присылает сообщение с просьбой отправить артикул товара.
 # Также появляется кнопка в клавиатуре “Назад” (при нажатии на которую бот возвращается в главное меню)
 # Хендлер, который срабатывает на добавить товар.
-from aiogram import Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
-from aiogram.utils.markdown import hide_link
 
 import keyboards
 import utils
-from db.models.product import Product
 from db.product_service import ProductService
-from db.user_service import UserService
+from db.user_product_service import UserProductService
 from form import Form
 from api import api_service
 from api.models.item_info import get_card
@@ -20,7 +17,7 @@ from handlers.router import router
 
 @router.message(Form.articul)
 async def process_name(message: Message, state: FSMContext, product_service: ProductService,
-                       user_service: UserService) -> None:
+                       user_product_service: UserProductService) -> None:
     number = message.text
     user_id = message.from_user.id
     await state.update_data(articul=number)
@@ -31,10 +28,10 @@ async def process_name(message: Message, state: FSMContext, product_service: Pro
             await state.set_state(Form.menu)
             product = product_service.get_product(number)
             if product:
-                if user_service.user_product_exists_by_number(user_id, product.number):
+                if user_product_service.user_product_exists_by_number(user_id, product.number):
                     await message.answer(f"Вы уже отслеживаете этот товар!", reply_markup=keyboards.menu_kb)
                 else:
-                    user_service.add_user_product(user_id, number, product_service)
+                    user_product_service.add_user_product(user_id, number, product_service)
                     await message.answer(f"Товар успешно добавлен!", reply_markup=keyboards.menu_kb)
                     info, kb = get_card(api_service.get_image(int(number)), product.availability, product.title,
                                         product.price, product.price, 0, 0)
@@ -53,7 +50,7 @@ async def process_name(message: Message, state: FSMContext, product_service: Pro
                         break
                 product_service.add_product(number, product_from_api[0]['name'], availability,
                                             product_from_api[0]['salePriceU'] / 100)
-                user_service.add_user_product(user_id, number, product_service)
+                user_product_service.add_user_product(user_id, number, product_service)
                 await message.answer(f"Товар успешно добавлен!")
                 info, kb = get_card(api_service.get_image(int(number)), availability, product_from_api[0]['name'],
                                     product_from_api[0]['salePriceU'] / 100,

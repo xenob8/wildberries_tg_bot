@@ -6,21 +6,22 @@ from aiogram.utils.markdown import hide_link
 import keyboards
 from api import api_service
 from db.product_service import ProductService
-from db.user_service import UserService
+from db.user_service import UserProductService
+from db.user_product_service import UserProductService
 from form import Form
 from api.models.item_info import get_card
 
 from handlers.router import router
 
 
-def get_items(user_id, user_service: UserService):
+def get_items(user_id, user_product_service: UserProductService):
     # Запрос к базе
-    return user_service.get_user_products(user_id)
+    return user_product_service.get_user_products(user_id)
 
 
 @router.message(Form.menu, F.text.casefold() == '🛍 мои товары')
-async def my_items(message: Message, user_service: UserService) -> None:
-    my_items = get_items(message.from_user.id, user_service)
+async def my_items(message: Message, user_product_service: UserProductService) -> None:
+    my_items = get_items(message.from_user.id, user_product_service)
     if not my_items:
         await message.answer(
             'Вы еще ничего не добавили'
