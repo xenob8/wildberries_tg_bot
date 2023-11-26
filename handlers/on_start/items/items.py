@@ -21,9 +21,7 @@ def get_items(user_id, user_service: UserService):
 @router.message(Form.menu, F.text.casefold() == '🛍 мои товары')
 async def my_items(message: Message, user_service: UserService) -> None:
     my_items = get_items(message.from_user.id, user_service)
-
-    print(my_items)
-    if my_items is None:
+    if not my_items:
         await message.answer(
             'Вы еще ничего не добавили'
         )

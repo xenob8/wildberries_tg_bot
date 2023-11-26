@@ -24,7 +24,7 @@ class UserService:
     @session_decorator
     def get_user_products(self, telegram_id: int, session: Session):
         products = session.query(Product, UserProduct).join(UserProduct, UserProduct.product_id == Product.id) \
-            .filter(UserProduct.user_telegram_id == telegram_id)
+            .filter(UserProduct.user_telegram_id == telegram_id).all()
         session.expunge_all()
         return products
 

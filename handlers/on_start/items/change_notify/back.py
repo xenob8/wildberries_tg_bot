@@ -14,9 +14,10 @@ from handlers.router import router
 async def back_to_item(callback: CallbackQuery, user_service: UserService):
     number = callback.data.split('to_card_item_')[1]
     user_product = user_service.get_user_product_by_number(callback.from_user.id, number)
-    info, kb = item_info.get_card(get_image(int(number)), user_product.Product.title, user_product.UserProduct.start_price,
-                              user_product.Product.price,
-                              user_product.Product.price - user_product.UserProduct.start_price,
-                              user_product.UserProduct.alert_threshold)
+    info, kb = item_info.get_card(get_image(int(number)), user_product.Product.availability, user_product.Product.title,
+                                  user_product.UserProduct.start_price,
+                                  user_product.Product.price,
+                                  user_product.Product.price - user_product.UserProduct.start_price,
+                                  user_product.UserProduct.alert_threshold)
     await callback.message.edit_text(info,
                                      reply_markup=kb(number))
