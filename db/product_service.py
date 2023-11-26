@@ -1,4 +1,5 @@
 from sqlalchemy import insert
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import sessionmaker, Session
 
 from db.dto.ProductUpdateDto import ProductUpdateDto
@@ -9,7 +10,7 @@ from db.utils import session_decorator, session_decorator_nested
 class ProductService:
 
     def __init__(self, engine):
-        self.session = sessionmaker(bind=engine)
+        self.session = sessionmaker(bind=engine, class_=AsyncSession)
 
     @session_decorator
     def product_exists_by_number(self, number, session):

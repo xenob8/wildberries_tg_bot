@@ -1,4 +1,5 @@
 from sqlalchemy import insert, select
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import sessionmaker, Session
 from db.models.product import Product
 from db.models.user import User
@@ -10,11 +11,14 @@ from db.utils import session_decorator, session_decorator_nested
 class UserService:
 
     def __init__(self, engine):
-        self.session = sessionmaker(bind=engine)
+        self.session = sessionmaker(bind=engine, class_=AsyncSession)
 
     @session_decorator
-    def get_user(self, telegram_id, session: Session):
-        return session.query(User).filter_by(telegram_id=telegram_id).first()
+    async def get_user(self, telegram_id, session: Session):
+        query = select(User).filter_by(telegram_id=telegram_id)
+        result = await session.execute(query)
+        return result.first()
+        # return session.query(User).filter_by(telegram_id=telegram_id).first()
 
     @session_decorator
     def add_user(self, telegram_id, session: Session):
@@ -22,9 +26,12 @@ class UserService:
         session.execute(inserting_user)
 
     @session_decorator
-    def get_user_products(self, telegram_id: int, session: Session):
-        products = session.query(Product, UserProduct).join(UserProduct, UserProduct.product_id == Product.id) \
+    async def get_user_products(self, telegram_id: int, session: Session):
+        query = select(Product, UserProduct).join(UserProduct, UserProduct.product_id == Product.id) \
             .filter(UserProduct.user_telegram_id == telegram_id)
+        result = await session.execute(query)
+        products = result.all()
+
         session.expunge_all()
         return products
 

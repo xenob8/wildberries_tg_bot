@@ -18,7 +18,7 @@ async def command_start(message: Message, state: FSMContext, user_service: UserS
     # мои товары, добавить товар, помощь, обратиться в поддержку
     await state.set_state(Form.menu)
     id_user = message.from_user.id
-    if not user_service.get_user(id_user):
+    if not await user_service.get_user(id_user):
         user_service.add_user(id_user)
     await message.answer(
         utils.info,

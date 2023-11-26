@@ -13,14 +13,18 @@ from api.models.item_info import get_card
 from handlers.router import router
 
 
-def get_items(user_id, user_service: UserService):
+async def get_items(user_id, user_service: UserService):
     # Запрос к базе
-    return user_service.get_user_products(user_id)
+    result = await user_service.get_user_products(user_id)
+    return result
 
 
 @router.message(Form.menu, F.text.casefold() == '🛍 мои товары')
 async def my_items(message: Message, user_service: UserService) -> None:
-    my_items = get_items(message.from_user.id, user_service)
+    my_items = await get_items(message.from_user.id, user_service)
+
+    # my_items = await user_service.get_user_products(message.from_user.id)
+    # my_items = await user_service.get_user_products(message.from_user.id)
 
     print(my_items)
     if my_items is None:
