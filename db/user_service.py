@@ -1,4 +1,4 @@
-from sqlalchemy import insert, select
+from sqlalchemy import insert, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import sessionmaker, Session
 from db.models.product import Product
@@ -59,7 +59,7 @@ class UserService:
         result = await session.execute(query)
         user_product = result.first()
         if user_product:
-            await session.delete(user_product)
+            await session.delete(user_product.UserProduct)
             # await session.commit() должен итак примениться надеюсь
 
     @session_decorator
@@ -80,18 +80,17 @@ class UserService:
         result = await session.execute(query)
         product = result.first()
 
-        query = select(UserProduct).filter_by(user_telegram_id=telegram_id, product_id=product.id)
+        query = select(UserProduct).filter_by(user_telegram_id=telegram_id, product_id=product.Product.id)
         result = await session.execute(query)
         user_product = result.first()
         if user_product:
-            user_product.update({"start_price": product.price})
-            session.commit()
+            user_product.UserProduct.start_price = product.Product.price
 
     @session_decorator_nested
     async def add_user_product(self, telegram_id, number, product_service: ProductService, session: Session):
         # if not product_service.product_exists_by_number(product.number):
         #     product_service.add_product(product)
         product = await product_service.get_product(number)
-        inserting_user = insert(UserProduct).values(user_telegram_id=telegram_id, product_id=product.id,
-                                                    start_price=product.price, alert_threshold=0)
+        inserting_user = insert(UserProduct).values(user_telegram_id=telegram_id, product_id=product.Product.id,
+                                                    start_price=product.Product.price, alert_threshold=0)
         await session.execute(inserting_user)
