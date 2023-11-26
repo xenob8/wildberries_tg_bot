@@ -4,7 +4,7 @@ from aiogram import BaseMiddleware
 from aiogram.types import Message
 
 from db.product_service import ProductService
-from db.user_service import UserProductService
+from db.user_service import UserService
 
 
 class CounterMiddleware(BaseMiddleware):
@@ -24,7 +24,7 @@ class CounterMiddleware(BaseMiddleware):
 class ServiceMiddleware(BaseMiddleware):
     def __init__(self, engine) -> None:
         self.product_service = ProductService(engine)
-        self.user_service = UserProductService(engine)
+        self.user_service = UserService(engine)
 
     async def __call__(
         self,

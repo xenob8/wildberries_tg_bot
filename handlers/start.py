@@ -7,13 +7,13 @@ from aiogram.types import Message
 
 import keyboards
 import utils
-from db.user_service import UserProductService
+from db.user_service import UserService
 from form import Form
 from handlers.router import router
 
 
 @router.message(CommandStart())
-async def command_start(message: Message, state: FSMContext, user_service: UserProductService) -> None:
+async def command_start(message: Message, state: FSMContext, user_service: UserService) -> None:
     # После команды запуска бота должны отображаться справочная информация и кнопки в клавиатуре(reply Markup):
     # мои товары, добавить товар, помощь, обратиться в поддержку
     await state.set_state(Form.menu)
