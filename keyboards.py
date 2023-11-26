@@ -83,5 +83,6 @@ def update_treshhold_kb(number):
     ])
 
 
-return_to_card_item_kb = InlineKeyboardMarkup(
-    inline_keyboard=[[InlineKeyboardButton(text="Назад", callback_data='to_card')]])
+def return_to_card_item_kb(number):
+    return InlineKeyboardMarkup(
+        inline_keyboard=[[InlineKeyboardButton(text="Назад", callback_data=f'to_card_{number}')]])
