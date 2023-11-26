@@ -67,11 +67,11 @@ class UserService:
         query = select(Product).filter_by(number=product_number)
         result = await session.execute(query)
         product = result.first()
-        query = select(UserProduct).filter_by(user_telegram_id=telegram_id, product_id=product.id)
+        query = select(UserProduct).filter_by(user_telegram_id=telegram_id, product_id=product.Product.id)
         result = await session.execute(query)
         user_product = result.first()
         if user_product:
-            user_product.update({"alert_threshold": alert_threshold})
+            user_product.UserProduct.alert_threshold = alert_threshold
             # session.commit()
 
     @session_decorator
