@@ -7,12 +7,13 @@ from aiogram.enums import ParseMode
 from sqlalchemy import create_engine
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 
-
 import config
 
 import handlers
 from api import api_service
+from db.product_service import ProductService
 from middleware.service_middleware import ServiceMiddleware
+from services import items_checker
 
 TOKEN = config.TOKEN
 
@@ -28,9 +29,19 @@ bot = Bot(token=TOKEN, parse_mode=ParseMode.HTML)
 dp = Dispatcher()
 
 
+async def regular_update():
+    product_service = ProductService(engine)
+    i = 0
+    while True:
+        print(f"Second {i}")
+        i += 3
+        await items_checker.update(bot, product_service)
+        await asyncio.sleep(3)
+
+
 async def main():
     dp.include_routers(handlers.router)
-
+    task = asyncio.create_task(regular_update())
     await dp.start_polling(bot)
 
 

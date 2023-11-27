@@ -41,5 +41,5 @@ async def update(message, product_service: ProductService, freq=60):
                 new_product = ProductUpdateDto(availability=availability_from_api)
                 await product_service.patch_product(product_art, new_product)
                 await notifier.notify_avail(product_art, availability_from_api, product_service, message)
-        time.sleep(freq)
+        #time.sleep(freq)
         print("updating")
