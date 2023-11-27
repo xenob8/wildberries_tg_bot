@@ -24,13 +24,13 @@ engine = create_async_engine(DATABASE_URL)
 service_middleware = ServiceMiddleware(engine)
 handlers.router.message.middleware(service_middleware)
 handlers.router.callback_query.middleware(service_middleware)
+product_service = service_middleware.product_service
 
 bot = Bot(token=TOKEN, parse_mode=ParseMode.HTML)
 dp = Dispatcher()
 
 
 async def regular_update():
-    product_service = ProductService(engine)
     i = 0
     while True:
         print(f"Second {i}")
